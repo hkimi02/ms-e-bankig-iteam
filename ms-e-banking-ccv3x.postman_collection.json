@@ -1,0 +1,1328 @@
+{
+  "info": {
+    "name": "ms-e-banking-ccv3x",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "E-banking microservices behind Spring Cloud Gateway (8888) + Eureka (8761). Run folders top to bottom: 'GET all accounts' stores {{accountId}}."
+  },
+  "variable": [
+    {
+      "key": "gateway",
+      "value": "http://localhost:8888"
+    },
+    {
+      "key": "eureka",
+      "value": "http://localhost:8761"
+    },
+    {
+      "key": "customerDirect",
+      "value": "http://localhost:8001"
+    },
+    {
+      "key": "accountDirect",
+      "value": "http://localhost:8100"
+    },
+    {
+      "key": "newMobile",
+      "value": "98765432"
+    },
+    {
+      "key": "accountId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1 - Gateway static routes (/customers/**, /accounts/**)",
+      "item": [
+        {
+          "name": "Customers",
+          "item": [
+            {
+              "name": "GET all customers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer by id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/customers/1",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers",
+                    "1"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer by mobile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/customers/fetch?mobileNumber=12345678",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers",
+                    "fetch"
+                  ],
+                  "query": [
+                    {
+                      "key": "mobileNumber",
+                      "value": "12345678"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST create customer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Sami\",\n  \"lastName\": \"Ben Ali\",\n  \"email\": \"sami@benali.com\",\n  \"mobileNumber\": \"{{newMobile}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST create customer (duplicate mobile -> 400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Sami\",\n  \"lastName\": \"Ben Ali\",\n  \"email\": \"sami@benali.com\",\n  \"mobileNumber\": \"{{newMobile}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 400', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST create customer (invalid -> 400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"\",\n  \"lastName\": \"X\",\n  \"email\": \"bad\",\n  \"mobileNumber\": \"12\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 400', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PUT update customer",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Sami\",\n  \"lastName\": \"Ben Ali\",\n  \"email\": \"sami.updated@benali.com\",\n  \"mobileNumber\": \"{{newMobile}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE customer by mobile",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/customers/delete?mobileNumber={{newMobile}}",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers",
+                    "delete"
+                  ],
+                  "query": [
+                    {
+                      "key": "mobileNumber",
+                      "value": "{{newMobile}}"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer not found (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/customers/999",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "customers",
+                    "999"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Accounts",
+          "item": [
+            {
+              "name": "GET all accounts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/accounts",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "accounts"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));",
+                      "const a = pm.response.json(); if (a.length) pm.collectionVariables.set('accountId', a[0].accountId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET account by id (with customer via Feign)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/accounts/{{accountId}}",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    "{{accountId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET accounts of customer 1",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/accounts/customer/1",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    "customer",
+                    "1"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET account not found (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/accounts/unknown-id",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    "unknown-id"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2 - Gateway dynamic routes (/{service-id}/**)",
+      "item": [
+        {
+          "name": "Customers (/ms-customer)",
+          "item": [
+            {
+              "name": "GET all customers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer by id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers/1",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers",
+                    "1"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer by mobile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers/fetch?mobileNumber=12345678",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers",
+                    "fetch"
+                  ],
+                  "query": [
+                    {
+                      "key": "mobileNumber",
+                      "value": "12345678"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST create customer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Sami\",\n  \"lastName\": \"Ben Ali\",\n  \"email\": \"sami@benali.com\",\n  \"mobileNumber\": \"{{newMobile}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', () => pm.response.to.have.status(201));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST create customer (duplicate mobile -> 400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Sami\",\n  \"lastName\": \"Ben Ali\",\n  \"email\": \"sami@benali.com\",\n  \"mobileNumber\": \"{{newMobile}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 400', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "POST create customer (invalid -> 400)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"\",\n  \"lastName\": \"X\",\n  \"email\": \"bad\",\n  \"mobileNumber\": \"12\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 400', () => pm.response.to.have.status(400));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PUT update customer",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"firstName\": \"Sami\",\n  \"lastName\": \"Ben Ali\",\n  \"email\": \"sami.updated@benali.com\",\n  \"mobileNumber\": \"{{newMobile}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE customer by mobile",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers/delete?mobileNumber={{newMobile}}",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers",
+                    "delete"
+                  ],
+                  "query": [
+                    {
+                      "key": "mobileNumber",
+                      "value": "{{newMobile}}"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer not found (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-customer/customers/999",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-customer",
+                    "customers",
+                    "999"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Accounts (/ms-account)",
+          "item": [
+            {
+              "name": "GET all accounts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-account/accounts",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-account",
+                    "accounts"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));",
+                      "const a = pm.response.json(); if (a.length) pm.collectionVariables.set('accountId', a[0].accountId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET account by id (with customer via Feign)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-account/accounts/{{accountId}}",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-account",
+                    "accounts",
+                    "{{accountId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET accounts of customer 1",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-account/accounts/customer/1",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-account",
+                    "accounts",
+                    "customer",
+                    "1"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET account not found (404)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-account/accounts/unknown-id",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-account",
+                    "accounts",
+                    "unknown-id"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 404', () => pm.response.to.have.status(404));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET build version",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-account/build-version",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-account",
+                    "build-version"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET contact info",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{gateway}}/ms-account/getContactInfo",
+                  "host": [
+                    "{{gateway}}"
+                  ],
+                  "path": [
+                    "ms-account",
+                    "getContactInfo"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3 - Direct calls (no gateway)",
+      "item": [
+        {
+          "name": "ms-customer :8001",
+          "item": [
+            {
+              "name": "GET all customers",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{customerDirect}}/customers",
+                  "host": [
+                    "{{customerDirect}}"
+                  ],
+                  "path": [
+                    "customers"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer by id",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{customerDirect}}/customers/1",
+                  "host": [
+                    "{{customerDirect}}"
+                  ],
+                  "path": [
+                    "customers",
+                    "1"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET customer by mobile",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{customerDirect}}/customers/fetch?mobileNumber=12345678",
+                  "host": [
+                    "{{customerDirect}}"
+                  ],
+                  "path": [
+                    "customers",
+                    "fetch"
+                  ],
+                  "query": [
+                    {
+                      "key": "mobileNumber",
+                      "value": "12345678"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "ms-account :8100",
+          "item": [
+            {
+              "name": "GET all accounts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{accountDirect}}/accounts",
+                  "host": [
+                    "{{accountDirect}}"
+                  ],
+                  "path": [
+                    "accounts"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));",
+                      "const a = pm.response.json(); if (a.length) pm.collectionVariables.set('accountId', a[0].accountId);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET account by id (with customer via Feign)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{accountDirect}}/accounts/{{accountId}}",
+                  "host": [
+                    "{{accountDirect}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    "{{accountId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET accounts of customer 1",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{accountDirect}}/accounts/customer/1",
+                  "host": [
+                    "{{accountDirect}}"
+                  ],
+                  "path": [
+                    "accounts",
+                    "customer",
+                    "1"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET build version",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{accountDirect}}/build-version",
+                  "host": [
+                    "{{accountDirect}}"
+                  ],
+                  "path": [
+                    "build-version"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "GET contact info",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{accountDirect}}/getContactInfo",
+                  "host": [
+                    "{{accountDirect}}"
+                  ],
+                  "path": [
+                    "getContactInfo"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', () => pm.response.to.have.status(200));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4 - Infrastructure",
+      "item": [
+        {
+          "name": "Gateway - list routes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/actuator/gateway/routes",
+              "host": [
+                "{{gateway}}"
+              ],
+              "path": [
+                "actuator",
+                "gateway",
+                "routes"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Gateway - health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway}}/actuator/health",
+              "host": [
+                "{{gateway}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eureka - registered apps",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{eureka}}/eureka/apps",
+              "host": [
+                "{{eureka}}"
+              ],
+              "path": [
+                "eureka",
+                "apps"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

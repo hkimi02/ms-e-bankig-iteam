@@ -1,0 +1,10 @@
+build:
+  version: "1.0"
+customers:
+  message: "Welcome to DigitBank customers related Prod APIs "
+  contactDetails:
+    name: "Amine hkimi - Product owner "
+    email: "hkimiamin02@gmail.com"
+  onCallSupport:
+    - (216) 97 653 312
+    - (216) 28 827 068

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Aggregator: "mvn clean install" here builds and tests the four microservices -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>tn.iteam</groupId>
+    <artifactId>ms-e-banking-ccv3x</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>ms-discovery</module>
+        <module>ms-customer</module>
+        <module>ms-account</module>
+        <module>ms-gateway</module>
+        <module>ms-config</module>
+    </modules>
+</project>

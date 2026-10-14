@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: ms-config
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: "classpath:/config/"   # src/main/resources/config
+
+server:
+  port: 8999
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true

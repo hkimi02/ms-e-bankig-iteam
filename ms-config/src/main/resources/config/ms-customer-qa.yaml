@@ -1,0 +1,10 @@
+build:
+  version: "3.0"
+customers:
+  message: "Welcome to DigitBank customers related QA APIs "
+  contactDetails:
+    name: "Hassen Lazrag - Dev Engineer"
+    email: "hassen.lazrag@gmail.com"
+  onCallSupport:
+    - (216) 97 568-738
+    - (216) 53 568-735
